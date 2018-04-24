@@ -624,6 +624,7 @@ public class JDBCFeatureSource extends ContentFeatureSource {
 
                 if ( dialect instanceof PreparedStatementSQLDialect ) {
                     PreparedStatement ps =getDataStore().selectJoinSQLPS(querySchema, join, preQuery, cx);
+                    // hckim: remove joined feature
                     //reader = new JDBCJoiningFeatureReader(ps, cx, this, querySchema, join, query.getHints());
                     reader = new JDBCFeatureReader( ps, cx, this, querySchema, query.getHints() );
                 } else {
@@ -631,7 +632,9 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                     String sql = getDataStore().selectJoinSQL(querySchema, join, preQuery);
                     getDataStore().getLogger().fine(sql);
 
-                    reader = new JDBCJoiningFeatureReader(sql, cx, this, querySchema, join, query.getHints());
+                    // hckim: remove joined feature
+                    //reader = new JDBCJoiningFeatureReader(sql, cx, this, querySchema, join, query.getHints());
+                    reader = new JDBCFeatureReader( sql, cx, this, querySchema, query.getHints() );
                 }
 
                 //check for post filters

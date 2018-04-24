@@ -3241,10 +3241,11 @@ public final class JDBCDataStore extends ContentDataStore
         //column names
         selectColumns(featureType, join.getPrimaryAlias(), query, sql);
 
+        // hckim: remove joined columns
         //joined columns
-        for (JoinPart part : join.getParts()) {
-            selectColumns(part.getQueryFeatureType(), part.getAlias(), query, sql);
-        }
+        //for (JoinPart part : join.getParts()) {
+        //    selectColumns(part.getQueryFeatureType(), part.getAlias(), query, sql);
+        //}
 
         sql.setLength(sql.length() - 1);
         dialect.encodePostSelect(featureType, sql);
@@ -3450,10 +3451,11 @@ public final class JDBCDataStore extends ContentDataStore
 
         selectColumns(featureType, join.getPrimaryAlias(), query, sql);
 
+        // hckim: remove joined columns
         //joined columns
-        /*for (JoinPart part : join.getParts()) {
-            selectColumns(part.getQueryFeatureType(), part.getAlias(), query, sql);
-        }*/
+        //for (JoinPart part : join.getParts()) {
+        //  selectColumns(part.getQueryFeatureType(), part.getAlias(), query, sql);
+        //}
 
         sql.setLength(sql.length() - 1);
         dialect.encodePostSelect(featureType, sql);
