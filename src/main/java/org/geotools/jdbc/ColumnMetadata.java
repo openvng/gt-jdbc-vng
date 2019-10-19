@@ -37,6 +37,10 @@ public class ColumnMetadata {
     boolean nullable;
     /** The native srid */
     Integer srid;
+    /** length */
+    Integer length;
+    /** scale */
+    Integer scale;
     
     public Class getBinding() {
         return binding;

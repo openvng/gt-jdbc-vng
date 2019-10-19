@@ -2995,10 +2995,29 @@ public final class JDBCDataStore extends ContentDataStore
             //some sql dialects require varchars to have an
             // associated size with them
             int length = -1;
-            if ( sqlTypeNames[i].toUpperCase().startsWith( "VARCHAR" ) ) {
+            int scale = -1;
+            String upperCaseTypeName = sqlTypeNames[i].toUpperCase();
+            if ( upperCaseTypeName.startsWith( "VARCHAR" ) ) {
                 if ( featureType != null ) {
                     AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
                     length = findVarcharColumnLength( att );
+                }
+            } else if ( 
+                upperCaseTypeName.startsWith( "NUM" )
+                //|| upperCaseTypeName.startsWith("DOUBLE")
+                //|| upperCaseTypeName.equals("REAL")
+                //|| upperCaseTypeName.equals("INTEGER") 
+                  ) { // NUMERIC TYPE
+                if ( featureType != null ) {
+                    AttributeDescriptor att = featureType.getDescriptor(columnNames[i]);
+                    Integer scaleObj = (Integer) att.getUserData().get("kr.vng.scale");
+                    Integer lengthObj = (Integer) att.getUserData().get("kr.vng.length");
+                    if (scaleObj != null) {
+                      scale = scaleObj.intValue();
+                    }
+                    if (lengthObj != null) {
+                      length = lengthObj.intValue();
+                    }
                 }
             }
 
@@ -3006,7 +3025,11 @@ public final class JDBCDataStore extends ContentDataStore
             if ( length == -1 ) {
                 dialect.encodeColumnType(sqlTypeNames[i], sql);
             } else {
-                dialect.encodeColumnType(sqlTypeNames[i] + "("+ length + ")", sql);
+                if (scale == -1 || scale == 0) {
+                  dialect.encodeColumnType(sqlTypeNames[i] + "(" + length + ")", sql);
+                } else {
+                  dialect.encodeColumnType(sqlTypeNames[i] + "(" + length + "," + scale + ")", sql);
+                }
             }
 
             //nullable

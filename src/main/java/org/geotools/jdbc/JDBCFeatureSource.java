@@ -346,6 +346,10 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                     //add the attribute
                     ab.setName(name);
                     ab.setBinding(binding);
+                    ab.setLength(column.length);
+                    ab.addUserData("kr.vng.length", column.length);
+                    int scale = column.scale;
+                    ab.addUserData("kr.vng.scale", scale);
                     att = ab.buildDescriptor(name, ab.buildType());
                 }
                 // mark primary key columns
@@ -838,6 +842,8 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 column.name = columns.getString("COLUMN_NAME");
                 column.typeName = columns.getString("TYPE_NAME");
                 column.sqlType = columns.getInt("DATA_TYPE");
+                column.length = columns.getInt("COLUMN_SIZE");
+                column.scale = columns.getInt("DECIMAL_DIGITS");
                 column.nullable = "YES".equalsIgnoreCase(columns.getString("IS_NULLABLE"));
                 column.binding = dialect.getMapping(columns, cx);
 
@@ -893,6 +899,8 @@ public class JDBCFeatureSource extends ContentFeatureSource {
                 column.name = metadata.getColumnLabel(i);
                 column.typeName = metadata.getColumnTypeName(i);
                 column.sqlType = metadata.getColumnType(i);
+                column.length = metadata.getPrecision(i);
+                column.scale = metadata.getScale(i);
                 column.nullable = metadata.isNullable(i) != ResultSetMetaData.columnNoNulls;
                 column.srid = vtable.getNativeSrid(column.name);
                 column.binding = vtable.getGeometryType(column.name);
