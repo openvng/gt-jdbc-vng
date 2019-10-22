@@ -2175,17 +2175,34 @@ public final class JDBCDataStore extends ContentDataStore
         //figure out which columns can not be null
         boolean[] nillable = new boolean[featureType.getAttributeCount()];
 
+        String geomName = null;
+        boolean geomNillable = false;
+        Class geomClass = null;
+        int idx = 0;
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeDescriptor attributeType = featureType.getDescriptor(i);
+            
+            if (attributeType instanceof GeometryDescriptor) {
+              geomName = attributeType.getLocalName();
+              geomClass = attributeType.getType().getBinding();
+              geomNillable = attributeType.getMinOccurs() <= 0 || attributeType.isNillable();
+              continue;
+            }
 
             //column name
-            columnNames[i] = attributeType.getLocalName();
+            columnNames[idx] = attributeType.getLocalName();
 
             //column type
-            classes[i] = attributeType.getType().getBinding();
+            classes[idx] = attributeType.getType().getBinding();
 
             //can be null?
-            nillable[i] = attributeType.getMinOccurs() <= 0 || attributeType.isNillable();
+            nillable[idx] = attributeType.getMinOccurs() <= 0 || attributeType.isNillable();
+            idx ++;
+        }
+        if (geomName != null) {
+          columnNames[idx] = geomName;
+          classes[idx] = geomClass;
+          nillable[idx] = geomNillable;
         }
 
         sqlTypeNames = getSQLTypeNames(classes, cx);
