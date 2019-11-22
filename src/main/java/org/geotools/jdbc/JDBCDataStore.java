@@ -1029,10 +1029,18 @@ public final class JDBCDataStore extends ContentDataStore
     protected PrimaryKey getPrimaryKey(ContentEntry entry)
         throws IOException {
         JDBCState state = (JDBCState) entry.getState(Transaction.AUTO_COMMIT);
+        
+        boolean isNullPrimaryKey = false;
+        if (state.getPrimaryKey() != null && (state.getPrimaryKey() instanceof NullPrimaryKey)) {
+          isNullPrimaryKey = true;
+        }
 
-        if (state.getPrimaryKey() == null) {
+        if (state.getPrimaryKey() == null || isNullPrimaryKey) {
             synchronized (this) {
-                if (state.getPrimaryKey() == null) {
+                if (state.getPrimaryKey() != null && (state.getPrimaryKey() instanceof NullPrimaryKey)) {
+                  isNullPrimaryKey = true;
+                }
+                if (state.getPrimaryKey() == null || isNullPrimaryKey) {
                     //get metadata from database
                     Connection cx = createConnection();
 
